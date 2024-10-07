@@ -67,6 +67,53 @@ services:
       retries: 8
       start_period: 4s
 
+  registry:
+    restart: always
+    image: registry:latest
+    container_name: registry
+    environment:
+      REGISTRY_STORAGE_DELETE_ENABLED: true
+    #   REGISTRY_AUTH: htpasswd
+    #   REGISTRY_AUTH_HTPASSWD_REALM: Registry Realm
+    #   REGISTRY_AUTH_HTPASSWD_PATH: /basic.auth
+    volumes:
+      - registry_data:/var/lib/registry
+    #   - ./auth/basic.auth:/basic.auth
+    # ports:
+    #   - "5000:5000"
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.registry.rule=Host(`registry${SHARED_DOMAIN_SEGMENT}.docker`)
+      - traefik.http.routers.registry.entrypoints=websecure
+      - traefik.http.routers.registry.tls=true
+      - traefik.http.routers.registry.service=registry
+      - traefik.http.services.registry.loadbalancer.server.port=5000
+      - traefik.http.routers.registry.middlewares=registry-auth
+      - traefik.http.middlewares.registry-auth.basicAuth.users=voale:$$2y$$05$$ruYpinT9Tao0fcYQ3jN8v.CuTOEL52Olz0cqSY9Qf50R7UVBjQ1ka
+
+      # # You can remove the line below to make accessible publicly
+      # - traefik.http.middlewares.private-network.ipwhitelist.sourcerange=comma,delimited,ips,here,to,allow
+      # # You can remove the line below to make accessible publicly
+      # - traefik.http.routers.registry.middlewares=private-network@docker
+  registryui:
+    image: joxit/docker-registry-ui:2.5.7-debian
+    container_name: registryui
+    environment:
+      - REGISTRY_TITLE=My Container Registry
+      - NGINX_PROXY_PASS_URL=http://registry:5000
+      - DELETE_IMAGES=true
+      # - REGISTRY_URL=http://registry:5000
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.registryui.rule=Host(`registry-ui${SHARED_DOMAIN_SEGMENT}.docker`)
+      - traefik.http.routers.registryui.entrypoints=websecure
+      - traefik.http.routers.registryui.tls=true
+      - traefik.http.routers.registryui.service=registryui
+      - traefik.http.services.registryui.loadbalancer.server.port=80
+      - traefik.http.services.registryui.loadbalancer.passhostheader=true
+      - traefik.http.routers.registryui.middlewares=registryui-auth
+      - traefik.http.middlewares.registryui-auth.basicAuth.users=voale:$$2y$$05$$WbRA8FbGQup57kmFaTIhvusr39nVysUi3DVF/ym6rvdOxXPfSs5o2
+
 networks:
   default:
     name: network.${COMPOSE_PROJECT_NAME}
@@ -76,5 +123,6 @@ networks:
 
 volumes:
   ui_data:
+  registry_data:
 
 ...
