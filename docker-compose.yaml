@@ -14,6 +14,7 @@ services:
       - ./traefik/certs/cert.pem:/etc/traefik/cert.pem
       - ./traefik/certs/key.pem:/etc/traefik/key.pem
       - ./traefik/custom:/etc/traefik/custom
+## k8s crt to enable external traefik for kubernetes to creating ingress into kube
 #      - ./auth/k8s.crt:/k8s.crt
     environment:
       - KUBECONFIG=k8s.crt
@@ -85,6 +86,7 @@ services:
     #   REGISTRY_AUTH_HTPASSWD_PATH: /basic.auth
     volumes:
       - registry_data:/var/lib/registry
+    ## you can add with 1$ in ./auth/basic.auth -> voale:$2y$05$ruYpinT9Tao0fcYQ3jN8v.CuTOEL52Olz0cqSY9Qf50R7UVBjQ1ka
     #   - ./auth/basic.auth:/basic.auth
     # ports:
     #   - "5000:5000"
