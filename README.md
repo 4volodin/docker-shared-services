@@ -203,6 +203,10 @@ If you **like/use** this project, please consider ⭐️ **starring** it. Thanks
 
     ```bash
     sudo sh -c 'echo "nameserver 127.0.0.1" > /etc/resolver/docker'
+    sudo sh -c 'echo "nameserver 127.0.0.1" > /etc/resolver/kube'
+    sudo sh -c 'echo "nameserver 127.0.0.1" > /etc/resolver/test'
+    sudo sh -c 'echo "nameserver 127.0.0.1" > /etc/resolver/k3d'
+    sudo sh -c 'echo "nameserver 127.0.0.1" > /etc/resolver/kind'
     sudo dscacheutil -flushcache
     sudo killall -HUP mDNSResponder
     ```

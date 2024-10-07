@@ -1,0 +1,38 @@
+http:
+  routers:
+    kube:
+      service: kube
+      # rule: "HostSNI(`*.test`)"
+      # rule: 'HostRegexp(`^.+\.kube$`)'
+      rule: 'HostRegexp(`^.+\.kube$|^.+\.10\.254\.254\.254\.nip\.io$`)'
+      entryPoints:
+        - web
+  services:
+    kube:
+      loadBalancer:
+        servers:
+          - url: "http://10.254.254.254:31080"
+        passHostHeader: true
+
+tcp:
+  routers:
+    my-tcp-router:
+      # rule: 'HostSNIRegexp(`^.+\.kube$`)'
+      rule: 'HostSNIRegexp(`^.+\.kube$|^.+\.10\.254\.254\.254\.nip\.io$`)'
+      # rule: 'HostSNI(`*`)'
+      service: my-tcp-service
+      entryPoints:
+        - websecure
+      # tls: {}  # Указываем, что маршрутизация должна происходить по TLS
+      tls:
+        passthrough: true
+      # tls:
+      #    certificates:
+      #     - certFile: /etc/traefik/cert.pem
+      #       keyFile:  /etc/traefik/key.pem
+
+  services:
+    my-tcp-service:
+      loadBalancer:
+        servers:
+          - address: "10.254.254.254:31443"  # Ваш backend для example.com

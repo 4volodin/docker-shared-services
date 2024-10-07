@@ -1,0 +1,34 @@
+http:
+  routers:
+    kind:
+      service: kind
+      rule: 'HostRegexp(`^.+\.kind$`)'
+      entryPoints:
+        - web
+  services:
+    kind:
+      loadBalancer:
+        servers:
+          - url: "http://10.254.254.254:30080"
+        passHostHeader: true
+
+tcp:
+  routers:
+    tcp-kind-router:
+      rule: 'HostSNIRegexp(`^.+\.kind$`)'
+      service: tcp-kind-service
+      entryPoints:
+        - websecure
+      # tls: {}  # Указываем, что маршрутизация должна происходить по TLS
+      tls:
+        passthrough: true
+      # tls:
+      #    certificates:
+      #     - certFile: /etc/traefik/cert.pem
+      #       keyFile:  /etc/traefik/key.pem
+
+  services:
+    tcp-kind-service:
+      loadBalancer:
+        servers:
+          - address: "10.254.254.254:30443"  # Ваш backend для example.com

@@ -1,0 +1,34 @@
+http:
+  routers:
+    k3d:
+      service: k3d
+      rule: 'HostRegexp(`^.+\.k3d$`)'
+      entryPoints:
+        - web
+  services:
+    k3d:
+      loadBalancer:
+        servers:
+          - url: "http://10.254.254.254:32080"
+        passHostHeader: true
+
+tcp:
+  routers:
+    tcp-k3d-router:
+      rule: 'HostSNIRegexp(`^.+\.k3d$`)'
+      service: tcp-k3d-service
+      entryPoints:
+        - websecure
+      # tls: {}  # Указываем, что маршрутизация должна происходить по TLS
+      tls:
+        passthrough: true
+      # tls:
+      #    certificates:
+      #     - certFile: /etc/traefik/cert.pem
+      #       keyFile:  /etc/traefik/key.pem
+
+  services:
+    tcp-k3d-service:
+      loadBalancer:
+        servers:
+          - address: "10.254.254.254:32443"  # Ваш backend для example.com
