@@ -13,12 +13,19 @@ services:
       - ./traefik/conf/traefik.yml:/etc/traefik/traefik.yml
       - ./traefik/certs/cert.pem:/etc/traefik/cert.pem
       - ./traefik/certs/key.pem:/etc/traefik/key.pem
+      - ./traefik/custom:/etc/traefik/custom
+#      - ./auth/k8s.crt:/k8s.crt
+    environment:
+      - KUBECONFIG=k8s.crt
+    # extra_hosts:
+    #   kubernetes.default: 127.0.0.1
     labels:
       - traefik.enable=true
       - traefik.http.routers.router.rule=Host(`router${SHARED_DOMAIN_SEGMENT}.docker`)
       - traefik.http.routers.router.entrypoints=websecure
       - traefik.http.services.router.loadbalancer.server.port=8080
       - traefik.http.routers.router.tls=true
+      - traefik.http.routers.router.service=router
     healthcheck:
       test: ['CMD-SHELL', 'traefik healthcheck --ping']
       interval: 4s

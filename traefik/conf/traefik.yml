@@ -10,6 +10,12 @@ providers:
   file:
     directory: /etc/traefik
     watch: true
+  # kubernetesIngress:
+  #   labelSelector: "traefik-ingress=traefik"
+  #   ingressClass: "traefik-lb"
+  #   ingressEndpoint:
+  #     ip: 10.254.254.254
+  #     # hostname: "host.docker.internal"
 
 api:
   insecure: true
